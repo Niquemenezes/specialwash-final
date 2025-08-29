@@ -1,0 +1,37 @@
+services:
+- type: web
+name: specialwash-final-backend
+env: python
+rootDir: backend
+plan: free
+buildCommand: pip install -r requirements.txt
+startCommand: gunicorn wsgi:app
+envVars:
+- key: PYTHON_VERSION
+value: 3.11.9
+- key: FRONTEND_ORIGIN
+fromService:
+type: web
+name: specialwash-final-frontend
+property: url
+- key: JWT_SECRET_KEY
+generateValue: true
+- key: ADMIN_SETUP_TOKEN
+generateValue: true
+- key: DATABASE_URL
+# configura aquí tu Postgres de Render o deja vacío para SQLite temporal (no recomendado en prod)
+value: ""
+
+
+- type: web
+name: specialwash-final-frontend
+env: static
+rootDir: frontend
+buildCommand: npm install && npm run build
+staticPublishPath: build
+envVars:
+- key: REACT_APP_API_URL
+fromService:
+type: web
+name: specialwash-final-backend
+property: url
